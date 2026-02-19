@@ -4,6 +4,7 @@ import com.aluracursos.literalura.model.Autor;
 import com.aluracursos.literalura.model.DatosLibro;
 import com.aluracursos.literalura.model.DatosResultados;
 import com.aluracursos.literalura.model.Libro;
+import com.aluracursos.literalura.repository.IAutorRepository;
 import com.aluracursos.literalura.repository.ILibroRepository;
 import com.aluracursos.literalura.service.ConsumoAPI;
 import com.aluracursos.literalura.service.ConvierteDatos;
@@ -19,9 +20,11 @@ public class Main {
     private final String URL_BASE = "https://gutendex.com/books?search=";
     private ConvierteDatos conversor = new ConvierteDatos();
     private ILibroRepository repositorio;
+    private IAutorRepository autorRepositorio;
 
-    public Main(ILibroRepository repositorio) {
+    public Main(ILibroRepository repositorio, IAutorRepository autorRepositorio) {
         this.repositorio = repositorio;
+        this.autorRepositorio = autorRepositorio;
     }
 
     public void showMenu(){
@@ -34,6 +37,7 @@ public class Main {
               4 - Lista de todos los libros
               5 - Listar autores vivos en determinado año
               6 - Lista de todos los autores
+              7 - Exhibir cantidad de libros en Italiano y Español
               
               0 - Salir
               """;
@@ -61,6 +65,8 @@ public class Main {
                 case 6:
                     listarTodosLosAutores();
                     break;
+                case 7:
+                    estadisticasDeIdiomas();
                 case 0:
                     System.out.println("Saliendo de la aplicación");
                     break;
@@ -145,28 +151,29 @@ public class Main {
         System.out.print("Ingrese el año en que desea buscar autores vivos: ");
         try {
             Integer anioBuscado = Integer.valueOf(input.nextLine());
-            List<Autor> autoresVivos = repositorio.listarAutoresVivosSegunAnio(anioBuscado);
+
+            List<Autor> autoresVivos = autorRepositorio.findByBirthYearLessThanEqualAndDeathYearGreaterThanEqual(anioBuscado, anioBuscado);
 
             if (autoresVivos.isEmpty()) {
-                System.out.println("No se encontraron autores vivos durante ese año en la base de datos.");
+                System.out.println("No se encontraron autores vivos durante el año " + anioBuscado + " en la base de datos.");
             } else {
                 System.out.println("-------------------------------------");
-                System.out.println("    LISTA AUTORES VIVOS EN "+anioBuscado);
+                System.out.println("    LISTA AUTORES VIVOS EN " + anioBuscado);
                 System.out.println("--------------------------------------");
                 autoresVivos.forEach(a -> System.out.printf("""
-                    
-                    --------------------------------------
-                    Nombre: %s
-                    Año de Nacimiento: %s
-                    Año de Defunción: %s
-                    --------------------------------------
-                    """,
+                
+                --------------------------------------
+                Nombre: %s
+                Año de Nacimiento: %s
+                Año de Defunción: %s
+                --------------------------------------
+                """,
                         a.getNombre(),
                         a.getBirthYear(),
                         a.getDeathYear() != null ? a.getDeathYear() : "Desconocido"));
             }
         } catch (NumberFormatException e) {
-            System.out.println("Por favor, ingrese un año válido en números (Ej: 1600).");
+            System.out.println("Por favor, ingrese un año válido numérico (Ejemplo: 1600).");
             System.out.println("--------------------------------------\n");
         }
     }
@@ -195,6 +202,20 @@ public class Main {
                     a.getBirthYear() != null ? a.getBirthYear() : "Desconocido",
                     a.getDeathYear() != null ? a.getDeathYear() : "Desconocido"));
         }
+    }
+    private void estadisticasDeIdiomas() {
+        System.out.println("--------------------------------------");
+        System.out.println("   ESTADÍSTICAS: ITALIANO Y ESPAÑOL   ");
+        System.out.println("--------------------------------------");
+
+        Integer cantidadEspanol = repositorio.countByLenguaje("es");
+        Integer cantidadItaliano = repositorio.countByLenguaje("it");
+        Integer cantidadIngles = repositorio.countByLenguaje("en");
+
+        System.out.println("Idioma: Español | Cantidad de libros: " + cantidadEspanol);
+        System.out.println("Idioma: Italiano | Cantidad de libros: " + cantidadItaliano);
+        System.out.println("Idioma: Ingles | Cantidad de libros: " + cantidadIngles);
+        System.out.println("--------------------------------------\n");
     }
 
     private void listarTodosLosLibros(){
