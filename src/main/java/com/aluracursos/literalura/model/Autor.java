@@ -2,26 +2,33 @@ package com.aluracursos.literalura.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "autor")
 public class Autor {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private int Id;
+    private Long Id;
     private String nombre;
-    private LocalDate birthYear;
-    private LocalDate deathYear;
-    @ManyToMany(fetch = FetchType.EAGER)
-    private String libro;
+    private Integer birthYear;
+    private Integer deathYear;
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Libro> libros;
 
     public Autor() {}
-    public Autor(String nombre, LocalDate birthYear, LocalDate deathYear, String libro) {
-        this.nombre = nombre;
-        this.birthYear = birthYear;
-        this.deathYear = deathYear;
-        this.libro = libro;
+    public Autor(DatosAutor datosAutor) {
+        this.nombre = datosAutor.nombre();
+        this.birthYear = datosAutor.birthYear();
+        this.deathYear = datosAutor.deathYear();
+    }
+
+    public Long getId() {
+        return Id;
+    }
+
+    public void setId(Long id) {
+        Id = id;
     }
 
     public String getNombre() {
@@ -32,29 +39,30 @@ public class Autor {
         this.nombre = nombre;
     }
 
-    public LocalDate getBirthYear() {
+    public Integer getBirthYear() {
         return birthYear;
     }
 
-    public void setBirthYear(LocalDate birthYear) {
+    public void setBirthYear(Integer birthYear) {
         this.birthYear = birthYear;
     }
 
-    public LocalDate getDeathYear() {
+    public Integer getDeathYear() {
         return deathYear;
     }
 
-    public void setDeathYear(LocalDate deathYear) {
+    public void setDeathYear(Integer deathYear) {
         this.deathYear = deathYear;
     }
 
-    public String getLibro() {
-        return libro;
+    public List<Libro> getLibros() {
+        return libros;
     }
 
-    public void setLibro(String libro) {
-        this.libro = libro;
+    public void setLibros(List<Libro> libros) {
+        this.libros = libros;
     }
+
     @Override
     public String toString() {
         return """
@@ -65,7 +73,7 @@ public class Autor {
                 "Nombre: " + nombre +
                 " | Año de nacimiento: " + birthYear +
                 " | Año de defunción: " + deathYear +
-                " | Libros: " + libro +
+                " | Libros: " + libros +
                 """
                  --------------------------------------
                 """;

@@ -11,10 +11,11 @@ public class Libro {
     private Long id;
     @Column(unique=true)
     private String titulo;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "autor_id")
     private Autor autor;
     private String lenguaje;
+    @Column(columnDefinition = "TEXT")
     private String sinopsis;
     private String tematica;
     private int numeroDescargas;
@@ -24,18 +25,28 @@ public class Libro {
 
     public Libro(DatosLibro datosLibro) {
         this.titulo = datosLibro.titulo();
-        this.autor = datosLibro.autor();
-        this.lenguaje = datosLibro.lenguaje();
-        this.sinopsis = datosLibro.sinopsis();
-        this.tematica = datosLibro.tematica();
+        if (datosLibro.autor() != null && !datosLibro.autor().isEmpty()) {
+            this.autor = new Autor(datosLibro.autor().get(0));
+        }
+        if (datosLibro.lenguaje() != null && !datosLibro.lenguaje().isEmpty()) {
+            this.lenguaje = datosLibro.lenguaje().get(0);
+        }
+        if (datosLibro.sinopsis() != null && !datosLibro.sinopsis().isEmpty()) {
+            this.sinopsis = datosLibro.sinopsis().get(0);
+        } else {
+            this.sinopsis = "Sin sinopsis disponible";
+        }
+        if (datosLibro.tematica() != null && !datosLibro.tematica().isEmpty()) {
+            this.tematica = datosLibro.tematica().get(0);
+        }
         this.numeroDescargas = datosLibro.numeroDescargas();
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -47,11 +58,11 @@ public class Libro {
         this.titulo = titulo;
     }
 
-    public String getAutor() {
+    public Autor getAutor() {
         return autor;
     }
 
-    public void setAutor(String autor) {
+    public void setAutor(Autor autor) {
         this.autor = autor;
     }
 
@@ -86,6 +97,7 @@ public class Libro {
     public void setNumeroDescargas(int numeroDescargas) {
         this.numeroDescargas = numeroDescargas;
     }
+
     @Override
     public String toString() {
         return """

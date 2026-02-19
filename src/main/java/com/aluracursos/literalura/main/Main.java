@@ -1,6 +1,7 @@
 package com.aluracursos.literalura.main;
 
 import com.aluracursos.literalura.model.DatosLibro;
+import com.aluracursos.literalura.model.DatosResultados;
 import com.aluracursos.literalura.model.Libro;
 import com.aluracursos.literalura.service.ConsumoAPI;
 import com.aluracursos.literalura.service.ConvierteDatos;
@@ -76,9 +77,18 @@ public class Main {
         System.out.print("Ingrese el titulo del libro: ");
         String tituloLibro = input.nextLine();
         var json = consumoAPI.getData(URL_BASE + tituloLibro.replace(" ", "%20"));
-        DatosLibro datos = conversor.obtenerDatos(json, DatosLibro.class);
-        System.out.println(datos.sinopsis());
-        return datos;
+        System.out.println("Respuesta JSON de la API: " + json);
+
+        DatosResultados datos = conversor.obtenerDatos(json, DatosResultados.class);
+
+        if (!datos.resultados().isEmpty()) {
+            DatosLibro libroEncontrado = datos.resultados().get(0);
+            System.out.println("Sinopsis: "+ libroEncontrado.sinopsis());
+            return libroEncontrado;
+        } else {
+            System.out.println("No se encontró el libro.");
+            return null;
+        }
     }
     private void buscarPorAutor(){
 
