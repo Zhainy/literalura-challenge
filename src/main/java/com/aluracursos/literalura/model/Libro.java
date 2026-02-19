@@ -100,19 +100,12 @@ public class Libro {
 
     @Override
     public String toString() {
-        return """
-                --------------------------------------
-                                Libro
-                --------------------------------------
-               """ +
-                "Titulo: " + titulo +
-                        " | Autor: " + autor +
-                        " | Sinopsis: " + sinopsis +
-                        " | Idioma: " + lenguaje +
-                        " | Temática: " + tematica +
-                        " | Descargas: " + numeroDescargas +
-                """
-                 --------------------------------------
-                """;
+        return "-------------------------------\n" +
+                "Título: " + titulo + "\n" +
+                "Autor: " + (autor != null ? autor.getNombre() : "Autor desconocido") + "\n" +
+                "Idioma: " + lenguaje + "\n" +
+                "Temática: " + tematica + "\n" +
+                "Descargas: " + numeroDescargas + "\n" +
+                "-------------------------------\n";
     }
 }
